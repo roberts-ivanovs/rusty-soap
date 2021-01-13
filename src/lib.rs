@@ -1,3 +1,5 @@
+mod exceptions;
+
 #[cfg(test)]
 mod tests {
     #[test]

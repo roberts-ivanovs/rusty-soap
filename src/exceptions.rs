@@ -15,33 +15,38 @@ pub enum RustySoapError {
     IncompleteOperation(Error),
     Empty,
 }
+#[derive(Debug)]
+pub struct Error(String);
 
-pub struct Error(&str);
-
+#[derive(Debug)]
 pub struct XMLParseError {
-    filename: &str,
-    sourceline: &str,
+    filename: String,
+    sourceline: String,
 }
 
+#[derive(Debug)]
 pub struct TransportError {
     status_code: u32,
-    content: &str,
+    content: String,
 }
+#[derive(Debug)]
 pub struct LookupError {
-    qname: &str,
-    item_name: &str,
-    location: &str,
+    qname: String,
+    item_name: String,
+    location: String,
 }
 
 // TODO These types may be incorrect. Hard to guess from the original code
+#[derive(Debug)]
 pub struct Fault {
-    message: &str,
-    code: &str,
-    actor: &str,
-    detail: &str,
-    subcodes: &str,
+    message: String,
+    code: String,
+    actor: String,
+    detail: String,
+    subcodes: String,
 }
 
+#[derive(Debug)]
 pub struct ValidationError {
-    path: &str,
+    path: String,
 }
