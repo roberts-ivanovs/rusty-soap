@@ -1,19 +1,25 @@
-#[derive(Debug)]
+use thiserror::Error;
+#[derive(Error, Debug)]
 pub enum RustySoapError {
-    Error(Error),
-    XMLSyntaxError(Error),
-    XMLParseError(XMLParseError),
-    UnexpectedElementError(Error),
-    WsdlSyntaxError(Error),
-    TransportError(TransportError),
-    LookupError(LookupError),
-    NamespaceError(Error),
-    Fault(Fault),
-    ValidationError(ValidationError),
-    SignatureVerificationFailed(Error),
-    IncompleteMessage(Error),
-    IncompleteOperation(Error),
+    // Error(Error),
+    // XMLSyntaxError(Error),
+    // XMLParseError(XMLParseError),
+    // UnexpectedElementError(Error),
+    // WsdlSyntaxError(Error),
+    // TransportError(TransportError),
+    // LookupError(LookupError),
+    // NamespaceError(Error),
+    // Fault(Fault),
+    // ValidationError(ValidationError),
+    // SignatureVerificationFailed(Error),
+    // IncompleteMessage(Error),
+    // IncompleteOperation(Error),
+    #[error(transparent)]
+    Base64Error(#[from] base64::DecodeError),
+
+    #[error("Error could not be determined")]
     Empty,
+
 }
 #[derive(Debug)]
 pub struct Error(String);
