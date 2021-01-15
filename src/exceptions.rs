@@ -1,3 +1,6 @@
+use std::str::Utf8Error;
+
+use sqlx;
 use thiserror::Error;
 #[derive(Error, Debug)]
 pub enum RustySoapError {
@@ -16,11 +19,15 @@ pub enum RustySoapError {
     // IncompleteOperation(Error),
     #[error(transparent)]
     Base64Error(#[from] base64::DecodeError),
+    #[error(transparent)]
+    SQLiteError(#[from] sqlx::Error),
+    #[error(transparent)]
+    UTF8ConversionError(#[from] Utf8Error),
 
     #[error("Error could not be determined")]
     Empty,
-
 }
+
 #[derive(Debug)]
 pub struct Error(String);
 
