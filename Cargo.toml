@@ -8,5 +8,17 @@ edition = "2018"
 
 [dependencies]
 log = "0.4"
-simple_logger = "1"
+simple_logger = "1.11"
 xmltree = "0.10"
+base64 = "0.13.0"
+thiserror = "1.0"
+chrono = "0.4"
+lazy_static = "1.4"
+sqlx = { version = "0.4.2", features = ["sqlite", "chrono", "macros", "runtime-tokio-rustls"] }
+async-trait = "0.1.42"
+futures-await-test = "0.3.0"
+tokio = { version = "1", features = ["full"] }
+
+[dev-dependencies]
+dotenv = "0.15.0"
+guerrilla = "0.1.4"

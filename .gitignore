@@ -1,2 +1,6 @@
 /target
 Cargo.lock
+
+# Ignore the cache dbs
+_schema.cache-*
+.test.db*
