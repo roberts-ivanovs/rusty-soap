@@ -8,11 +8,12 @@ edition = "2018"
 
 [dependencies]
 log = "0.4"
-simple_logger = "1"
+simple_logger = "1.11"
 xmltree = "0.10"
 base64 = "0.13.0"
-thiserror = "1"
+thiserror = "1.0"
 chrono = "0.4"
+lazy_static = "1.4"
 
 [dev-dependencies]
 guerrilla = "0.1.4"

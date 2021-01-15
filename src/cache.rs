@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, sync::Mutex};
 
 use base64;
 use chrono::{DateTime, Duration, NaiveDateTime, TimeZone, Utc};
@@ -9,7 +9,7 @@ use crate::exceptions::RustySoapError;
 /// Base class for caching backends.
 trait Base {
     fn add(&mut self, url: &str, content: &str);
-    fn get(&self, url: &str) -> Option<&String>;
+    fn get(&self, url: &str) -> Option<String>;
 }
 
 /// Versioned base class for caching backends.
@@ -19,6 +19,10 @@ struct VersionCacheBase {
 }
 
 impl VersionCacheBase {
+    fn new(version: String) -> Self {
+        Self { version }
+    }
+
     /// Helper function for encoding cacheable content as base64.
     fn _encode_data(&self, data: &str) -> String {
         let data = base64::encode(data);
@@ -46,15 +50,18 @@ impl VersionCacheBase {
 }
 
 /// Simple in-memory caching using dict lookup with support for timeouts
+
+lazy_static! {
+    static ref IN_MEMORY_CACHE: Mutex<HashMap<String, (chrono::DateTime<Utc>, String)>> = Mutex::new(HashMap::new());
+}
+
 struct InMemoryCache {
-    cache: HashMap<String, (chrono::DateTime<Utc>, String)>,
     timeout: Option<i64>,
 }
 
 impl InMemoryCache {
     pub fn new() -> Self {
         InMemoryCache {
-            cache: HashMap::new(),
             timeout: Some(36000),
         }
     }
@@ -63,16 +70,17 @@ impl InMemoryCache {
 impl Base for InMemoryCache {
     fn add(&mut self, url: &str, content: &str) {
         debug!("Caching contents of {}", &url);
-        self.cache
+        IN_MEMORY_CACHE.lock().unwrap()
             .insert(url.to_owned(), (Utc::now(), content.to_string()));
     }
 
-    fn get(&self, url: &str) -> Option<&String> {
-        let item = self.cache.get(url);
+    fn get(&self, url: &str) -> Option<String> {
+        let hm = IN_MEMORY_CACHE.lock().unwrap();
+        let item = hm.get(url);
         return match item {
             Some((time, data)) if !is_expired(time, self.timeout) => {
                 debug!("Cache HIT for {}", &url);
-                Some(data)
+                Some(data.clone())
             }
             _ => {
                 debug!("Cache MISS for {}", &url);
@@ -113,8 +121,7 @@ mod test_memory_cache {
             None => panic!("Does not contain a string"),
         };
 
-        let _guard = guerrilla::patch2(is_expired, |time, timeout| true);
-
+        let _guard = guerrilla::patch2(is_expired, |_, _| true);
         let result = c.get("http://tests.python-zeep.org/example.wsdl");
         drop(_guard);
         assert_eq!(result, None)
@@ -123,9 +130,10 @@ mod test_memory_cache {
     #[test]
     fn memory_cache_share_data() {
         let mut c = InMemoryCache::new();
+        let b = InMemoryCache::new();
         let input = "content";
         c.add("http://tests.python-zeep.org/example.wsdl", input);
-        let result = c.get("http://tests.python-zeep.org/example.wsdl");
+        let result = b.get("http://tests.python-zeep.org/example.wsdl");
 
         match result {
             Some(v) => {
