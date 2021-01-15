@@ -18,7 +18,7 @@ sqlx = { version = "0.4.2", features = ["sqlite", "chrono", "macros", "runtime-t
 async-trait = "0.1.42"
 futures-await-test = "0.3.0"
 tokio = { version = "1", features = ["full"] }
-dotenv = "0.15.0"
 
 [dev-dependencies]
+dotenv = "0.15.0"
 guerrilla = "0.1.4"
