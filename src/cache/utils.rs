@@ -1,9 +1,9 @@
 use std::{collections::HashMap, sync::Mutex};
 
+use async_trait::async_trait;
 use base64;
 use chrono::{DateTime, Duration, Utc};
 use log::{debug, trace};
-use async_trait::async_trait;
 
 use crate::exceptions::RustySoapError;
 
@@ -11,7 +11,7 @@ use crate::exceptions::RustySoapError;
 #[async_trait]
 pub trait Base {
     async fn add(&mut self, url: &str, content: &str) -> Result<(), RustySoapError>;
-    async fn get(&self, url: &str) -> Result<Option<String>, RustySoapError>;
+    async fn get(&mut self, url: &str) -> Result<Option<String>, RustySoapError>;
 }
 
 /// Versioned base class for caching backends.
@@ -36,8 +36,7 @@ impl VersionCacheBase {
         let version_string = self.version_string();
         let version = version_string.as_str();
         if data.starts_with(version) {
-            // TODO CHECK IF THIS IS CORRECT
-            let a = data.split_at(version.len()).0;
+            let a = data.split_at(version.len()).1;
             let res = base64::decode(a).map_err(|source| RustySoapError::Base64Error(source));
             return Some(res);
         }
@@ -50,8 +49,6 @@ impl VersionCacheBase {
         prefix
     }
 }
-
-
 
 /// Return boolean if the value is expired
 pub fn is_expired(value: &DateTime<Utc>, timeout: Option<i64>) -> bool {
@@ -93,5 +90,3 @@ mod test_is_expired {
         assert!(!res)
     }
 }
-
-// TODO Unit Test VersionCacheBase

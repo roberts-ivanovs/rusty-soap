@@ -1,4 +1,4 @@
-use std::str::Utf8Error;
+use std::{io, str::Utf8Error};
 
 use sqlx;
 use thiserror::Error;
@@ -23,6 +23,8 @@ pub enum RustySoapError {
     SQLiteError(#[from] sqlx::Error),
     #[error(transparent)]
     UTF8ConversionError(#[from] Utf8Error),
+    #[error(transparent)]
+    FileError(#[from] io::Error),
 
     #[error("Error could not be determined")]
     Empty,
