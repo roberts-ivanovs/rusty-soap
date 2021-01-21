@@ -3,8 +3,9 @@ extern crate lazy_static;
 
 mod cache;
 mod exceptions;
-mod settings;
 mod ns;
+mod settings;
+mod xsd;
 
 #[cfg(test)]
 mod tests {
